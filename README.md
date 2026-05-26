@@ -735,8 +735,7 @@ Verifique:
 A documentação detalhada está em:
 
 ```text
-docs/documentacao-tech-challenge-fiap-completa.pdf
-docs/documentacao-tech-challenge-fiap-completa.docx
+docs/tech challenger 3.pdf
 ```
 
 A documentação explica:
