@@ -1,0 +1,41 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: appointment-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/appointments_db}
+    username: ${DB_USERNAME:hospital}
+    password: ${DB_PASSWORD:hospital}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  rabbitmq:
+    host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5672}
+    username: ${RABBIT_USERNAME:guest}
+    password: ${RABBIT_PASSWORD:guest}
+  graphql:
+    graphiql:
+      enabled: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:fiap-tech-challenge-secret-key-with-at-least-32-characters}
+    expiration-minutes: 120
+  rabbitmq:
+    exchange: hospital.appointments.exchange
+    notification-queue: hospital.notifications.queue
+    created-routing-key: appointment.created
+    updated-routing-key: appointment.updated
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

@@ -1,0 +1,76 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: hospital-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  postgres-appointments:
+    image: postgres:16
+    container_name: hospital-postgres-appointments
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: appointments_db
+      POSTGRES_USER: hospital
+      POSTGRES_PASSWORD: hospital
+    volumes:
+      - appointments_data:/var/lib/postgresql/data
+
+  postgres-notifications:
+    image: postgres:16
+    container_name: hospital-postgres-notifications
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: notifications_db
+      POSTGRES_USER: hospital
+      POSTGRES_PASSWORD: hospital
+    volumes:
+      - notifications_data:/var/lib/postgresql/data
+
+  appointment-service:
+    build: ./appointment-service
+    container_name: hospital-appointment-service
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://postgres-appointments:5432/appointments_db
+      DB_USERNAME: hospital
+      DB_PASSWORD: hospital
+      RABBIT_HOST: rabbitmq
+      RABBIT_PORT: 5672
+      RABBIT_USERNAME: guest
+      RABBIT_PASSWORD: guest
+    depends_on:
+      - postgres-appointments
+      - rabbitmq
+    profiles:
+      - app
+
+  notification-service:
+    build: ./notification-service
+    container_name: hospital-notification-service
+    ports:
+      - "8081:8081"
+    environment:
+      DB_URL: jdbc:postgresql://postgres-notifications:5432/notifications_db
+      DB_USERNAME: hospital
+      DB_PASSWORD: hospital
+      RABBIT_HOST: rabbitmq
+      RABBIT_PORT: 5672
+      RABBIT_USERNAME: guest
+      RABBIT_PASSWORD: guest
+    depends_on:
+      - postgres-notifications
+      - rabbitmq
+    profiles:
+      - app
+
+volumes:
+  appointments_data:
+  notifications_data:
